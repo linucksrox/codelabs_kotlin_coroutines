@@ -68,28 +68,28 @@ class TitleRepository(private val network: MainNetwork, private val titleDao: Ti
             }
         }
     }
+}
 
-    /**
-     * Thrown when there was a error fetching a new title
-     *
-     * @property message user ready error message
-     * @property cause the original cause of this exception
-     */
-    class TitleRefreshError(cause: Throwable) : Throwable(cause.message, cause)
+/**
+ * Thrown when there was an error fetching a new title
+ *
+ * @property message user ready error message
+ * @property cause the original cause of this exception
+ */
+class TitleRefreshError(cause: Throwable) : Throwable(cause.message, cause)
 
-    /**
-     * Suspend function to use callback-based [FakeNetworkCall] in coroutines
-     *
-     * @return network result after completion
-     * @throws Throwable original exception from library if network request fails
-     */
-    suspend fun <T> FakeNetworkCall<T>.await(): T {
-        return suspendCoroutine { continuation ->
-            addOnResultListener { result ->
-                when (result) {
-                    is FakeNetworkSuccess<T> -> continuation.resume(result.data)
-                    is FakeNetworkError -> continuation.resumeWithException(result.error)
-                }
+/**
+ * Suspend function to use callback-based [FakeNetworkCall] in coroutines
+ *
+ * @return network result after completion
+ * @throws Throwable original exception from library if network request fails
+ */
+suspend fun <T> FakeNetworkCall<T>.await(): T {
+    return suspendCoroutine { continuation ->
+        addOnResultListener { result ->
+            when (result) {
+                is FakeNetworkSuccess<T> -> continuation.resume(result.data)
+                is FakeNetworkError -> continuation.resumeWithException(result.error)
             }
         }
     }

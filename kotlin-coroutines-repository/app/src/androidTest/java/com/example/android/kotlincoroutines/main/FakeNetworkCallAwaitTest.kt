@@ -16,16 +16,17 @@ class FakeNetworkCallAwaitTest {
     fun whenFakeNetworkCallSuccess_resumeWithResult() {
         val subject = makeSuccessCall("the title")
 
-        // TODO: Implement test for await success
+        runBlocking {
+            Truth.assertThat(subject.await()).isEqualTo("the title")
+        }
     }
 
     @Test(expected = FakeNetworkException::class)
     fun whenFakeNetworkCallFailure_throws() {
         val subject = makeFailureCall(FakeNetworkException("the error"))
 
-        // TODO: Implement test for await failure
         runBlocking {
-            Truth.assertThat(subject.await()).isEqualTo("the title")
+            subject.await()
         }
     }
 }
