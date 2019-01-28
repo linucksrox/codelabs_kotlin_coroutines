@@ -20,6 +20,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.example.android.kotlincoroutines.util.BACKGROUND
+import kotlinx.coroutines.*
 
 /**
  * MainViewModel designed to store and manage UI-related data in a lifecycle conscious way. This
@@ -45,19 +46,30 @@ class MainViewModel : ViewModel() {
     val snackbar: LiveData<String>
         get() = _snackBar
 
-    // TODO: Add viewModelJob and uiScope here
+    // Important: You must pass CoroutineScope a Job in order to cancel all coroutines started in the scope. If you don't, the scope will run until your app is terminated.
+    // Scopes created with the CoroutineScope constructor add an implicit job, which you can cancel using uiScope.coroutineContext.cancel()
 
-    // TODO: Add onCleared() here to cancel viewModelJob
+    // Set up a new Coroutine scope by creating a new Job() and setting the CoroutineScope default to Dispatchers.Main
+    private val viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    // Override onCleared() for when ViewModel is destroyed, we should also cancel out of any running coroutines at this point
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
 
     /**
      * Wait one second then display a snackbar.
      */
     fun onMainViewClicked() {
-        // TODO: Replace with coroutine implementation
-        BACKGROUND.submit {
-            Thread.sleep(1_000)
-            // use postValue since we're in a background thread
-            _snackBar.postValue("Hello, from threads!")
+        // launch a coroutine in uiScope
+        uiScope.launch {
+            // suspend this coroutine for one second
+            delay(1_000)
+            // resume in the main dispatcher
+            // _snackbar.value can be called directly from the main thread
+            _snackBar.value = "Hello from coroutines!"
         }
     }
 
