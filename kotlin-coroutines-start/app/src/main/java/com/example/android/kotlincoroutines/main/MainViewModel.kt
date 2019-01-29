@@ -19,7 +19,6 @@ package com.example.android.kotlincoroutines.main
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.example.android.kotlincoroutines.util.BACKGROUND
 import kotlinx.coroutines.*
 
 /**
@@ -62,11 +61,11 @@ class MainViewModel : ViewModel() {
     /**
      * Wait one second then display a snackbar.
      */
-    fun onMainViewClicked() {
+    fun onMainViewClicked(showAfter: Long = 1_000) {
         // launch a coroutine in uiScope
         uiScope.launch {
             // suspend this coroutine for one second
-            delay(1_000)
+            delay(showAfter)
             // resume in the main dispatcher
             // _snackbar.value can be called directly from the main thread
             _snackBar.value = "Hello from coroutines!"
